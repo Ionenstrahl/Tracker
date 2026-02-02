@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Habit Tracker</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🌟 Habit Tracker</h1>
+            <button id="settings-btn" class="settings-btn">⚙️</button>
+        </header>
+
+        <!-- Settings Modal -->
+        <div id="settings-modal" class="modal hidden">
+            <div class="modal-content">
+                <h2>Settings</h2>
+                <div class="form-group">
+                    <label for="username">Pixe.la Username:</label>
+                    <input type="text" id="username" placeholder="Enter username">
+                </div>
+                <div class="form-group">
+                    <label for="token">Pixe.la Token:</label>
+                    <input type="password" id="token" placeholder="Enter token">
+                </div>
+                <div class="form-group">
+                    <label>
+                        <input type="checkbox" id="remember-settings">
+                        Remember settings (stored locally)
+                    </label>
+                </div>
+                <div class="button-group">
+                    <button id="save-settings" class="btn btn-primary">Save</button>
+                    <button id="close-settings" class="btn btn-secondary">Cancel</button>
+                </div>
+                <hr>
+                <div class="help-section">
+                    <h3>Setup Instructions</h3>
+                    <ol>
+                        <li>Visit <a href="https://pixe.la/" target="_blank">pixe.la</a></li>
+                        <li>Create an account using the API or CLI</li>
+                        <li>Create 6 graphs for each habit with IDs: meditation, sports, dancing, gaming, freshair, sauna</li>
+                        <li>Enter your username and token here</li>
+                    </ol>
+                </div>
+            </div>
+        </div>
+
+        <!-- Date Selector -->
+        <div class="date-selector">
+            <label for="track-date">Track for date:</label>
+            <input type="date" id="track-date">
+            <button id="today-btn" class="btn btn-small">Today</button>
+        </div>
+
+        <!-- Activity Buttons -->
+        <div class="activities">
+            <button class="activity-btn" data-activity="meditation">
+                🧘 Meditation
+            </button>
+            <button class="activity-btn" data-activity="sports">
+                🏃 Sports
+            </button>
+            <button class="activity-btn" data-activity="dancing">
+                💃 Dancing
+            </button>
+            <button class="activity-btn" data-activity="gaming">
+                🎮 Gaming
+            </button>
+            <button class="activity-btn" data-activity="freshair">
+                🌳 Fresh Air
+            </button>
+            <button class="activity-btn" data-activity="sauna">
+                🧖 Sauna
+            </button>
+        </div>
+
+        <!-- Status Messages -->
+        <div id="status" class="status hidden"></div>
+
+        <!-- Activity Log -->
+        <div class="log-section">
+            <h2>Today's Activities</h2>
+            <div id="activity-log" class="activity-log"></div>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
