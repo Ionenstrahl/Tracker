@@ -21,6 +21,19 @@ body {
     box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
 }
 
+/* Hero Image */
+.hero-image {
+    margin: -20px -20px 20px -20px;
+    border-radius: 20px 20px 0 0;
+    overflow: hidden;
+}
+
+.hero-image img {
+    width: 100%;
+    height: auto;
+    display: block;
+}
+
 header {
     display: flex;
     justify-content: space-between;
