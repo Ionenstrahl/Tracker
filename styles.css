@@ -41,7 +41,7 @@ header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 15px 20px;
+    padding: 5px 20px;
     background: rgba(0, 0, 0, 0.5);
     backdrop-filter: blur(10px);
     z-index: 100;
