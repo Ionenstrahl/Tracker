@@ -34,16 +34,26 @@ body {
 }
 
 header {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 30px;
-    padding: 20px 20px 0 20px;
+    padding: 15px 20px;
+    background: rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(10px);
+    z-index: 100;
+    max-width: 600px;
+    margin: 0 auto;
 }
 
 h1 {
-    color: #667eea;
-    font-size: 28px;
+    color: white;
+    font-size: 24px;
+    font-weight: 600;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
 }
 
 h2 {
@@ -59,6 +69,7 @@ h2 {
     cursor: pointer;
     padding: 5px;
     transition: transform 0.2s;
+    filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3));
 }
 
 .settings-btn:hover {
@@ -130,6 +141,7 @@ h2 {
     gap: 10px;
     align-items: center;
     margin-bottom: 30px;
+    margin-top: 20px;
     padding: 0 20px;
     flex-wrap: wrap;
 }
@@ -322,7 +334,7 @@ hr {
 /* Mobile Responsive */
 @media (max-width: 600px) {
     h1 {
-        font-size: 24px;
+        font-size: 20px;
     }
 
     .activities {
