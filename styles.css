@@ -6,9 +6,10 @@
 
 body {
     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: white;
     min-height: 100vh;
-    padding: 20px;
+    padding: 0;
+    margin: 0;
     color: #333;
 }
 
@@ -16,15 +17,13 @@ body {
     max-width: 600px;
     margin: 0 auto;
     background: white;
-    border-radius: 20px;
-    padding: 20px;
-    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+    padding: 0 0 20px 0;
+    min-height: 100vh;
 }
 
 /* Hero Image */
 .hero-image {
-    margin: -20px -20px 20px -20px;
-    border-radius: 20px 20px 0 0;
+    width: 100%;
     overflow: hidden;
 }
 
@@ -39,6 +38,7 @@ header {
     justify-content: space-between;
     align-items: center;
     margin-bottom: 30px;
+    padding: 20px 20px 0 20px;
 }
 
 h1 {
@@ -130,6 +130,7 @@ h2 {
     gap: 10px;
     align-items: center;
     margin-bottom: 30px;
+    padding: 0 20px;
     flex-wrap: wrap;
 }
 
@@ -194,6 +195,7 @@ h2 {
     grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
     gap: 15px;
     margin-bottom: 30px;
+    padding: 0 20px;
 }
 
 .activity-btn {
@@ -231,7 +233,7 @@ h2 {
 .status {
     padding: 15px;
     border-radius: 10px;
-    margin-bottom: 20px;
+    margin: 0 20px 20px 20px;
     text-align: center;
     font-weight: 600;
 }
@@ -261,7 +263,7 @@ h2 {
 /* Activity Log */
 .log-section {
     margin-top: 30px;
-    padding-top: 20px;
+    padding: 20px 20px 0 20px;
     border-top: 2px solid #e0e0e0;
 }
 
@@ -319,15 +321,6 @@ hr {
 
 /* Mobile Responsive */
 @media (max-width: 600px) {
-    body {
-        padding: 10px;
-    }
-
-    .container {
-        padding: 15px;
-        border-radius: 15px;
-    }
-
     h1 {
         font-size: 24px;
     }
