@@ -27,7 +27,6 @@ const trackDateInput = document.getElementById('track-date');
 const todayBtn = document.getElementById('today-btn');
 const activityButtons = document.querySelectorAll('.activity-btn');
 const statusDiv = document.getElementById('status');
-const activityLog = document.getElementById('activity-log');
 
 // Initialize
 function init() {
@@ -222,7 +221,6 @@ async function trackActivity(activityKey) {
         if (response.ok && result.isSuccess) {
             trackedActivities.add(activityKey);
             updateActivityButton(activityKey, true);
-            updateActivityLog();
             showStatus(`${activity.emoji} ${activity.name} tracked!`, 'success');
         } else {
             throw new Error(result.message || 'Failed to track activity');
@@ -279,26 +277,6 @@ async function loadTodaysActivities() {
             updateActivityButton(key, false);
         }
     }
-
-    updateActivityLog();
-}
-
-// Update activity log display
-function updateActivityLog() {
-    activityLog.innerHTML = '';
-
-    if (trackedActivities.size === 0) {
-        activityLog.innerHTML = '<p style="color: #999;">No activities tracked yet for this date.</p>';
-        return;
-    }
-
-    trackedActivities.forEach(key => {
-        const activity = ACTIVITIES[key];
-        const logItem = document.createElement('div');
-        logItem.className = 'log-item';
-        logItem.textContent = `${activity.emoji} ${activity.name}`;
-        activityLog.appendChild(logItem);
-    });
 }
 
 // Start the app
