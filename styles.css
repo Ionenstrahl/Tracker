@@ -333,6 +333,88 @@ hr {
     border-top: 1px solid #e0e0e0;
 }
 
+/* Tab Navigation */
+.tabs {
+    display: flex;
+    gap: 8px;
+    padding: 16px 20px;
+    border-bottom: 2px solid #e0e0e0;
+}
+
+.tab-btn {
+    flex: 1;
+    padding: 10px;
+    border: 2px solid #e0e0e0;
+    border-radius: 25px;
+    background: white;
+    font-size: 15px;
+    font-weight: 600;
+    color: #666;
+    cursor: pointer;
+    transition: all 0.25s;
+}
+
+.tab-btn:hover {
+    border-color: #667eea;
+    color: #667eea;
+}
+
+.tab-btn.active {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border-color: #667eea;
+    color: white;
+}
+
+.tab-panel {
+    animation: fadeSlideIn 0.3s ease;
+}
+
+.tab-panel.hidden {
+    display: none;
+}
+
+@keyframes fadeSlideIn {
+    from { opacity: 0; transform: translateY(8px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+
+/* Graphs */
+.graphs-container {
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.graph-card {
+    border: 2px solid #e0e0e0;
+    border-radius: 15px;
+    overflow: hidden;
+}
+
+.graph-card-header {
+    padding: 12px 16px;
+    font-size: 16px;
+    font-weight: 600;
+    color: #333;
+    background: #fafafa;
+    border-bottom: 1px solid #e0e0e0;
+}
+
+.graph-card img {
+    width: 100%;
+    display: block;
+    min-height: 80px;
+    background: #f5f5f5;
+}
+
+.graphs-empty {
+    text-align: center;
+    padding: 60px 20px;
+    color: #999;
+    font-size: 16px;
+}
+
 /* Mobile Responsive */
 @media (max-width: 600px) {
     h1 {

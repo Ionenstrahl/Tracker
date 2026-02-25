@@ -53,6 +53,14 @@
             </div>
         </div>
 
+        <!-- Tab Navigation -->
+        <nav class="tabs">
+            <button class="tab-btn active" data-tab="tracker">Tracker</button>
+            <button class="tab-btn" data-tab="graphs">Graphs</button>
+        </nav>
+
+        <div class="tab-panel" id="tab-tracker">
+
         <!-- Date Selector -->
         <div class="date-selector">
             <label for="track-date">Track for date:</label>
@@ -90,6 +98,14 @@
             <h2>Today's Activities</h2>
             <div id="activity-log" class="activity-log"></div>
         </div>
+
+        </div><!-- end tab-tracker -->
+
+        <!-- Graphs Tab Panel -->
+        <div class="tab-panel hidden" id="tab-graphs">
+            <div id="graphs-container" class="graphs-container"></div>
+        </div>
+
     </div>
 
     <script src="app.js"></script>

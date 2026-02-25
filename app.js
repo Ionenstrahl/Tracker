@@ -77,6 +77,7 @@ function saveSettings() {
     hideSettings();
     showStatus('Settings saved successfully!', 'success');
     loadTodaysActivities();
+    if (!document.getElementById('tab-graphs').classList.contains('hidden')) renderGraphs();
 }
 
 // Set date input to today
@@ -95,6 +96,10 @@ function setupEventListeners() {
     trackDateInput.addEventListener('change', (e) => {
         selectedDate = e.target.valueAsDate || new Date();
         loadTodaysActivities();
+    });
+
+    document.querySelectorAll('.tab-btn').forEach(btn => {
+        btn.addEventListener('click', () => switchTab(btn.dataset.tab));
     });
 
     activityButtons.forEach(btn => {
@@ -138,6 +143,36 @@ function formatDateForPixela(date) {
     const month = String(date.getMonth() + 1).padStart(2, '0');
     const day = String(date.getDate()).padStart(2, '0');
     return `${year}${month}${day}`;
+}
+
+// Tab switching
+function switchTab(tabName) {
+    document.querySelectorAll('.tab-btn').forEach(btn => {
+        btn.classList.toggle('active', btn.dataset.tab === tabName);
+    });
+    document.querySelectorAll('.tab-panel').forEach(panel => {
+        panel.classList.toggle('hidden', panel.id !== `tab-${tabName}`);
+    });
+    if (tabName === 'graphs') renderGraphs();
+}
+
+// Render graphs from Pixe.la
+function renderGraphs() {
+    const container = document.getElementById('graphs-container');
+    if (!username || !token) {
+        container.innerHTML = '<p class="graphs-empty">Please configure your settings first.</p>';
+        return;
+    }
+    container.innerHTML = Object.entries(ACTIVITIES).map(([, activity]) => `
+        <div class="graph-card">
+            <div class="graph-card-header">${activity.emoji} ${activity.name}</div>
+            <img
+                src="${PIXELA_API_BASE}/users/${username}/graphs/${activity.graphId}"
+                alt="${activity.name} graph"
+                loading="lazy"
+            >
+        </div>
+    `).join('');
 }
 
 // Fetch with retry on network errors and server errors (5xx)
