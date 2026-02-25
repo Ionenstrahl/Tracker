@@ -140,6 +140,19 @@ function formatDateForPixela(date) {
     return `${year}${month}${day}`;
 }
 
+// Fetch with retry on network errors and server errors (5xx)
+async function fetchWithRetry(url, options, maxRetries = 2) {
+    for (let attempt = 0; attempt <= maxRetries; attempt++) {
+        try {
+            const response = await fetch(url, options);
+            if (response.status < 500 || attempt === maxRetries) return response;
+        } catch (error) {
+            if (attempt === maxRetries) throw error;
+        }
+        await new Promise(resolve => setTimeout(resolve, 1000));
+    }
+}
+
 // Track activity
 async function trackActivity(activityKey) {
     if (!username || !token) {
@@ -154,7 +167,7 @@ async function trackActivity(activityKey) {
     try {
         showStatus(`Tracking ${activity.name}...`, 'info');
 
-        const response = await fetch(
+        const response = await fetchWithRetry(
             `${PIXELA_API_BASE}/users/${username}/graphs/${activity.graphId}`,
             {
                 method: 'POST',
@@ -206,7 +219,7 @@ async function loadTodaysActivities() {
 
     for (const [key, activity] of Object.entries(ACTIVITIES)) {
         try {
-            const response = await fetch(
+            const response = await fetchWithRetry(
                 `${PIXELA_API_BASE}/users/${username}/graphs/${activity.graphId}/${dateStr}`,
                 {
                     headers: {
