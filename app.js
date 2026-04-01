@@ -248,8 +248,26 @@ function buildGraphDays(displayStart, displayEnd, rangeStart, rangeEnd, trackedD
     return days;
 }
 
+function buildMonthBoundaryWeeks(days) {
+    const boundaryWeeks = new Set();
+
+    days.forEach((day, index) => {
+        if (!day.inRange || day.date.getDate() !== 1) {
+            return;
+        }
+
+        const weekIndex = Math.floor(index / 7);
+        if (weekIndex > 0) {
+            boundaryWeeks.add(weekIndex);
+        }
+    });
+
+    return boundaryWeeks;
+}
+
 function renderBooleanGraph(days, activityKey) {
     const weekCount = Math.ceil(days.length / 7);
+    const monthBoundaryWeeks = buildMonthBoundaryWeeks(days);
 
     return `
         <div
@@ -257,17 +275,19 @@ function renderBooleanGraph(days, activityKey) {
             style="--activity-color: ${ACTIVITY_COLORS[activityKey] || '#667eea'}; --week-count: ${weekCount};"
         >
             <div class="boolean-graph-grid">
-                ${days.map(day => {
+                ${days.map((day, index) => {
+                    const weekIndex = Math.floor(index / 7);
                     const cellClass = day.inRange
                         ? (day.tracked ? 'is-tracked' : 'is-empty')
                         : 'is-outside';
+                    const separatorClass = monthBoundaryWeeks.has(weekIndex) ? 'has-month-separator' : '';
                     const statusLabel = day.inRange
                         ? (day.tracked ? 'Tracked' : 'Not tracked')
                         : 'Outside selected range';
 
                     return `
                         <span
-                            class="boolean-graph-cell ${cellClass}"
+                            class="boolean-graph-cell ${cellClass} ${separatorClass}"
                             title="${formatDisplayDate(day.date)}: ${statusLabel}"
                             aria-label="${formatDisplayDate(day.date)}: ${statusLabel}"
                         ></span>
