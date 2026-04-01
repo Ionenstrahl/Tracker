@@ -1,5 +1,19 @@
 // Configuration
 const PIXELA_API_BASE = 'https://pixe.la/v1';
+const GRAPH_PERIOD_DAYS = 365;
+const ACTIVITY_COLORS = {
+    meditation: '#0f766e',
+    sports: '#dc2626',
+    dancing: '#db2777',
+    gaming: '#2563eb',
+    freshair: '#16a34a',
+    sauna: '#ea580c'
+};
+const DATE_LABEL_FORMATTER = new Intl.DateTimeFormat(undefined, {
+    year: 'numeric',
+    month: 'short',
+    day: 'numeric'
+});
 const ACTIVITIES = {
     meditation: { name: 'Meditation', emoji: '🧘', graphId: 'meditation-graph' },
     sports: { name: 'Sports', emoji: '🏃', graphId: 'sports-graph' },
@@ -14,6 +28,7 @@ let username = '';
 let token = '';
 let selectedDate = new Date();
 let trackedActivities = new Set();
+let graphRenderSequence = 0;
 
 // DOM Elements
 const settingsBtn = document.getElementById('settings-btn');
@@ -31,13 +46,11 @@ const statusDiv = document.getElementById('status');
 // Initialize
 function init() {
     loadSettings();
-    setDateToToday();
     setupEventListeners();
+    updateSelectedDate(new Date(), { refresh: Boolean(username && token) });
 
     if (!username || !token) {
         showSettings();
-    } else {
-        loadTodaysActivities();
     }
 }
 
@@ -75,15 +88,12 @@ function saveSettings() {
 
     hideSettings();
     showStatus('Settings saved successfully!', 'success');
-    loadTodaysActivities();
-    if (!document.getElementById('tab-graphs').classList.contains('hidden')) renderGraphs();
+    refreshCurrentViews();
 }
 
 // Set date input to today
 function setDateToToday() {
-    const today = new Date();
-    selectedDate = today;
-    trackDateInput.valueAsDate = today;
+    updateSelectedDate(new Date());
 }
 
 // Setup event listeners
@@ -93,8 +103,7 @@ function setupEventListeners() {
     saveSettingsBtn.addEventListener('click', saveSettings);
     todayBtn.addEventListener('click', setDateToToday);
     trackDateInput.addEventListener('change', (e) => {
-        selectedDate = e.target.valueAsDate || new Date();
-        loadTodaysActivities();
+        updateSelectedDate(parseDateInputValue(e.target.value) || new Date());
     });
 
     document.querySelectorAll('.tab-btn').forEach(btn => {
@@ -144,6 +153,58 @@ function formatDateForPixela(date) {
     return `${year}${month}${day}`;
 }
 
+function formatDateForInput(date) {
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
+}
+
+function parseDateInputValue(value) {
+    if (!value) return null;
+    const parts = value.split('-').map(Number);
+    if (parts.length !== 3 || parts.some(part => Number.isNaN(part))) return null;
+    return new Date(parts[0], parts[1] - 1, parts[2]);
+}
+
+function atStartOfDay(date) {
+    return new Date(date.getFullYear(), date.getMonth(), date.getDate());
+}
+
+function addDays(date, days) {
+    const nextDate = atStartOfDay(date);
+    nextDate.setDate(nextDate.getDate() + days);
+    return nextDate;
+}
+
+function getStartOfWeek(date) {
+    const start = atStartOfDay(date);
+    const dayOfWeek = start.getDay();
+    const mondayOffset = dayOfWeek === 0 ? -6 : 1 - dayOfWeek;
+    start.setDate(start.getDate() + mondayOffset);
+    return start;
+}
+
+function isGraphsTabVisible() {
+    return !document.getElementById('tab-graphs').classList.contains('hidden');
+}
+
+function refreshCurrentViews() {
+    loadTodaysActivities();
+    if (isGraphsTabVisible()) {
+        renderGraphs();
+    }
+}
+
+function updateSelectedDate(date, { refresh = true } = {}) {
+    selectedDate = atStartOfDay(date);
+    trackDateInput.value = formatDateForInput(selectedDate);
+
+    if (refresh) {
+        refreshCurrentViews();
+    }
+}
+
 // Tab switching
 function switchTab(tabName) {
     document.querySelectorAll('.tab-btn').forEach(btn => {
@@ -155,23 +216,152 @@ function switchTab(tabName) {
     if (tabName === 'graphs') renderGraphs();
 }
 
+function getGraphDisplayWindow(anchorDate) {
+    const rangeEnd = atStartOfDay(anchorDate);
+    const rangeStart = addDays(rangeEnd, -(GRAPH_PERIOD_DAYS - 1));
+    const displayStart = getStartOfWeek(rangeStart);
+    const daysUntilSunday = rangeEnd.getDay() === 0 ? 0 : 7 - rangeEnd.getDay();
+    const displayEnd = addDays(rangeEnd, daysUntilSunday);
+
+    return { rangeStart, rangeEnd, displayStart, displayEnd };
+}
+
+function formatDisplayDate(date) {
+    return DATE_LABEL_FORMATTER.format(date);
+}
+
+function buildGraphDays(displayStart, displayEnd, rangeStart, rangeEnd, trackedDates) {
+    const days = [];
+
+    for (let currentDate = atStartOfDay(displayStart); currentDate <= displayEnd; currentDate = addDays(currentDate, 1)) {
+        const dateStr = formatDateForPixela(currentDate);
+        const inRange = currentDate >= rangeStart && currentDate <= rangeEnd;
+
+        days.push({
+            date: atStartOfDay(currentDate),
+            dateStr,
+            inRange,
+            tracked: inRange && trackedDates.has(dateStr)
+        });
+    }
+
+    return days;
+}
+
+function renderBooleanGraph(days, activityKey) {
+    const weekCount = Math.ceil(days.length / 7);
+
+    return `
+        <div
+            class="boolean-graph"
+            style="--activity-color: ${ACTIVITY_COLORS[activityKey] || '#667eea'}; --week-count: ${weekCount};"
+        >
+            <div class="boolean-graph-grid">
+                ${days.map(day => {
+                    const cellClass = day.inRange
+                        ? (day.tracked ? 'is-tracked' : 'is-empty')
+                        : 'is-outside';
+                    const statusLabel = day.inRange
+                        ? (day.tracked ? 'Tracked' : 'Not tracked')
+                        : 'Outside selected range';
+
+                    return `
+                        <span
+                            class="boolean-graph-cell ${cellClass}"
+                            title="${formatDisplayDate(day.date)}: ${statusLabel}"
+                            aria-label="${formatDisplayDate(day.date)}: ${statusLabel}"
+                        ></span>
+                    `;
+                }).join('')}
+            </div>
+        </div>
+    `;
+}
+
+async function fetchGraphPixels(graphId, fromDate, toDate) {
+    const params = new URLSearchParams({
+        from: formatDateForPixela(fromDate),
+        to: formatDateForPixela(toDate),
+        withBody: 'true'
+    });
+    const response = await fetchWithRetry(
+        `${PIXELA_API_BASE}/users/${username}/graphs/${graphId}/pixels?${params.toString()}`,
+        {
+            headers: {
+                'X-USER-TOKEN': token
+            }
+        }
+    );
+
+    const data = await response.json().catch(() => ({}));
+
+    if (!response.ok) {
+        throw new Error(data.message || 'Failed to load graph history');
+    }
+
+    return Array.isArray(data.pixels) ? data.pixels : [];
+}
+
+function renderGraphCard(activityKey, activity, days, trackedCount, totalDays) {
+    return `
+        <div class="graph-card">
+            <div class="graph-card-header">
+                <span>${activity.emoji} ${activity.name}</span>
+                <span class="graph-card-summary">${trackedCount}/${totalDays} days</span>
+            </div>
+            ${renderBooleanGraph(days, activityKey)}
+        </div>
+    `;
+}
+
+function renderGraphErrorCard(activity) {
+    return `
+        <div class="graph-card">
+            <div class="graph-card-header">
+                <span>${activity.emoji} ${activity.name}</span>
+            </div>
+            <div class="graph-error">Could not load this graph.</div>
+        </div>
+    `;
+}
+
 // Render graphs from Pixe.la
-function renderGraphs() {
+async function renderGraphs() {
     const container = document.getElementById('graphs-container');
     if (!username || !token) {
         container.innerHTML = '<p class="graphs-empty">Please configure your settings first.</p>';
         return;
     }
-    container.innerHTML = Object.entries(ACTIVITIES).map(([, activity]) => `
-        <div class="graph-card">
-            <div class="graph-card-header">${activity.emoji} ${activity.name}</div>
-            <img
-                src="${PIXELA_API_BASE}/users/${username}/graphs/${activity.graphId}"
-                alt="${activity.name} graph"
-                loading="lazy"
-            >
-        </div>
-    `).join('');
+
+    const renderId = ++graphRenderSequence;
+    const { rangeStart, rangeEnd, displayStart, displayEnd } = getGraphDisplayWindow(selectedDate);
+    const totalDays = GRAPH_PERIOD_DAYS;
+
+    container.innerHTML = '<p class="graphs-loading">Loading graphs...</p>';
+
+    const graphCards = await Promise.all(
+        Object.entries(ACTIVITIES).map(async ([activityKey, activity]) => {
+            try {
+                const pixels = await fetchGraphPixels(activity.graphId, rangeStart, rangeEnd);
+                const trackedDates = new Set(
+                    pixels
+                        .filter(pixel => Number.parseFloat(pixel.quantity) > 0)
+                        .map(pixel => pixel.date)
+                );
+                const days = buildGraphDays(displayStart, displayEnd, rangeStart, rangeEnd, trackedDates);
+                return renderGraphCard(activityKey, activity, days, trackedDates.size, totalDays);
+            } catch (error) {
+                console.error(`Error loading graph ${activity.name}:`, error);
+                return renderGraphErrorCard(activity);
+            }
+        })
+    );
+
+    if (renderId !== graphRenderSequence) {
+        return;
+    }
+
+    container.innerHTML = graphCards.join('');
 }
 
 // Fetch with retry on network errors and server errors (5xx)
@@ -222,6 +412,9 @@ async function trackActivity(activityKey) {
             trackedActivities.add(activityKey);
             updateActivityButton(activityKey, true);
             showStatus(`${activity.emoji} ${activity.name} tracked!`, 'success');
+            if (isGraphsTabVisible()) {
+                renderGraphs();
+            }
         } else {
             throw new Error(result.message || 'Failed to track activity');
         }
