@@ -4,6 +4,26 @@
     box-sizing: border-box;
 }
 
+:root {
+    --graph-empty-cell-bg: #e6ebf4;
+    --graph-outside-cell-bg: #f4f5f7;
+    --graph-month-separator-color: rgba(100, 116, 139, 0.28);
+}
+
+html.dark-mode {
+    --graph-empty-cell-bg: #2f3642;
+    --graph-outside-cell-bg: #1f242d;
+    --graph-month-separator-color: rgba(148, 163, 184, 0.35);
+}
+
+@media (prefers-color-scheme: dark) {
+    :root {
+        --graph-empty-cell-bg: #2f3642;
+        --graph-outside-cell-bg: #1f242d;
+        --graph-month-separator-color: rgba(148, 163, 184, 0.35);
+    }
+}
+
 body {
     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
     background: white;
@@ -428,7 +448,7 @@ hr {
     top: 0;
     bottom: 0;
     width: 1px;
-    background: rgba(100, 116, 139, 0.28);
+    background: var(--graph-month-separator-color);
 }
 
 .boolean-graph-cell.is-tracked {
@@ -437,25 +457,11 @@ hr {
 }
 
 .boolean-graph-cell.is-empty {
-    background: #e6ebf4;
+    background: var(--graph-empty-cell-bg);
 }
 
 .boolean-graph-cell.is-outside {
-    background: #f4f5f7;
-}
-
-@media (prefers-color-scheme: dark) {
-    .boolean-graph-cell.is-empty {
-        background: #2f3642;
-    }
-
-    .boolean-graph-cell.is-outside {
-        background: #1f242d;
-    }
-
-    .boolean-graph-cell.has-month-separator::before {
-        background: rgba(148, 163, 184, 0.35);
-    }
+    background: var(--graph-outside-cell-bg);
 }
 
 .graph-error {

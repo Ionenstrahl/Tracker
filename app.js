@@ -23,6 +23,10 @@ const ACTIVITIES = {
     sauna: { name: 'Sauna', emoji: '🧖', graphId: 'sauna-graph' }
 };
 
+const darkModeMediaQuery = typeof window.matchMedia === 'function'
+    ? window.matchMedia('(prefers-color-scheme: dark)')
+    : null;
+
 // State
 let username = '';
 let token = '';
@@ -46,6 +50,7 @@ const statusDiv = document.getElementById('status');
 // Initialize
 function init() {
     loadSettings();
+    syncThemeMode();
     setupEventListeners();
     updateSelectedDate(new Date(), { refresh: Boolean(username && token) });
 
@@ -123,6 +128,14 @@ function setupEventListeners() {
             hideSettings();
         }
     });
+
+    if (darkModeMediaQuery) {
+        if (typeof darkModeMediaQuery.addEventListener === 'function') {
+            darkModeMediaQuery.addEventListener('change', syncThemeMode);
+        } else if (typeof darkModeMediaQuery.addListener === 'function') {
+            darkModeMediaQuery.addListener(syncThemeMode);
+        }
+    }
 }
 
 // Show/hide settings modal
@@ -132,6 +145,28 @@ function showSettings() {
 
 function hideSettings() {
     settingsModal.classList.add('hidden');
+}
+
+function detectAutoDarkMode() {
+    if (!document.body) return false;
+
+    // Force a light-only probe so Android auto-darking can still be detected.
+    const probe = document.createElement('div');
+    probe.style.display = 'none';
+    probe.style.backgroundColor = 'canvas';
+    probe.style.colorScheme = 'light';
+    document.body.appendChild(probe);
+
+    const computedBackground = window.getComputedStyle(probe).backgroundColor;
+    probe.remove();
+
+    return computedBackground !== 'rgb(255, 255, 255)';
+}
+
+function syncThemeMode() {
+    const prefersDarkMode = Boolean(darkModeMediaQuery && darkModeMediaQuery.matches);
+    const isDarkMode = prefersDarkMode || detectAutoDarkMode();
+    document.documentElement.classList.toggle('dark-mode', isDarkMode);
 }
 
 // Show status message
