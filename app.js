@@ -322,12 +322,12 @@ async function fetchGraphPixels(graphId, fromDate, toDate) {
     return Array.isArray(data.pixels) ? data.pixels : [];
 }
 
-function renderGraphCard(activityKey, activity, days, trackedCount, totalDays) {
+function renderGraphCard(activityKey, activity, days, trackedCount) {
     return `
         <div class="graph-card">
             <div class="graph-card-header">
                 <span>${activity.emoji} ${activity.name}</span>
-                <span class="graph-card-summary">${trackedCount}/${totalDays} days</span>
+                <span class="graph-card-summary">${trackedCount} days</span>
             </div>
             ${renderBooleanGraph(days, activityKey)}
         </div>
@@ -355,7 +355,6 @@ async function renderGraphs() {
 
     const renderId = ++graphRenderSequence;
     const { rangeStart, rangeEnd, displayStart, displayEnd } = getGraphDisplayWindow(selectedDate);
-    const totalDays = GRAPH_PERIOD_DAYS;
 
     container.innerHTML = '<p class="graphs-loading">Loading graphs...</p>';
 
@@ -369,7 +368,7 @@ async function renderGraphs() {
                         .map(pixel => pixel.date)
                 );
                 const days = buildGraphDays(displayStart, displayEnd, rangeStart, rangeEnd, trackedDates);
-                return renderGraphCard(activityKey, activity, days, trackedDates.size, totalDays);
+                return renderGraphCard(activityKey, activity, days, trackedDates.size);
             } catch (error) {
                 console.error(`Error loading graph ${activity.name}:`, error);
                 return renderGraphErrorCard(activity);
