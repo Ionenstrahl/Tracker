@@ -444,6 +444,20 @@ hr {
     background: #f4f5f7;
 }
 
+@media (prefers-color-scheme: dark) {
+    .boolean-graph-cell.is-empty {
+        background: #2f3642;
+    }
+
+    .boolean-graph-cell.is-outside {
+        background: #1f242d;
+    }
+
+    .boolean-graph-cell.has-month-separator::before {
+        background: rgba(148, 163, 184, 0.35);
+    }
+}
+
 .graph-error {
     padding: 20px 16px;
     color: #b45309;
