@@ -25,8 +25,9 @@
     --activity-button-border: #e0e0e0;
     --input-background: #ffffff;
     --graph-empty-cell-bg: #e6ebf4;
+    --graph-empty-cell-alt-bg: #d7e0ee;
     --graph-outside-cell-bg: #f4f5f7;
-    --graph-month-separator-color: rgba(100, 116, 139, 0.28);
+    --graph-outside-cell-alt-bg: #e7ebf1;
 }
 
 html.dark-mode {
@@ -50,8 +51,9 @@ html.dark-mode {
     --activity-button-border: #334155;
     --input-background: #0f172a;
     --graph-empty-cell-bg: #2f3642;
+    --graph-empty-cell-alt-bg: #39414f;
     --graph-outside-cell-bg: #1f242d;
-    --graph-month-separator-color: rgba(148, 163, 184, 0.35);
+    --graph-outside-cell-alt-bg: #29303b;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -76,8 +78,9 @@ html.dark-mode {
         --activity-button-border: #334155;
         --input-background: #0f172a;
         --graph-empty-cell-bg: #2f3642;
+        --graph-empty-cell-alt-bg: #39414f;
         --graph-outside-cell-bg: #1f242d;
-        --graph-month-separator-color: rgba(148, 163, 184, 0.35);
+        --graph-outside-cell-alt-bg: #29303b;
     }
 }
 
@@ -501,21 +504,10 @@ hr {
 
 .boolean-graph-cell {
     display: block;
-    position: relative;
     width: 100%;
     height: 100%;
     border-radius: clamp(1px, 0.3vw, 3px);
     background: #e5e7eb;
-}
-
-.boolean-graph-cell.has-month-separator::before {
-    content: '';
-    position: absolute;
-    left: calc(clamp(1px, 0.35vw, 3px) * -1);
-    top: 0;
-    bottom: 0;
-    width: 1px;
-    background: var(--graph-month-separator-color);
 }
 
 .boolean-graph-cell.is-tracked {
@@ -527,8 +519,16 @@ hr {
     background: var(--graph-empty-cell-bg);
 }
 
+.boolean-graph-cell.is-empty.is-alt-month {
+    background: var(--graph-empty-cell-alt-bg);
+}
+
 .boolean-graph-cell.is-outside {
     background: var(--graph-outside-cell-bg);
+}
+
+.boolean-graph-cell.is-outside.is-alt-month {
+    background: var(--graph-outside-cell-alt-bg);
 }
 
 .graph-error {
